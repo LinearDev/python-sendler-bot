@@ -139,7 +139,8 @@ async def add_admin(message: types.Message):
 async def get_count(message: types.Message):
     if db.get_admins(message.from_user.id):
         user_count = str(db.get_user_count()).replace("(", '').replace(")", '').replace("[", '').replace("]", '').replace(",", '')
-        await bot.send_message(message.from_user.id, "Users in bot: "+user_count)
+        active_users = str(db.get_user_count()).replace("(", '').replace(")", '').replace("[", '').replace("]", '').replace(",", '')
+        await bot.send_message(message.from_user.id, "Users in bot: "+user_count+"\nActive users: "+active_users)
     
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates = True)

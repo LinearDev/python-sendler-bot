@@ -25,6 +25,10 @@ class Database:
     def get_user_count(self):
         with self.connetion:
             return self.cursor.execute("SELECT COUNT(*) FROM `users`").fetchmany(1)
+    
+    def get__active_user_count(self):
+        with self.connetion:
+            return self.cursor.execute("SELECT COUNT(*) FROM `users` WHERE `active` = ?", (1,)).fetchmany(1)
 
     def get_admins(self, admin_id):
         with self.connetion:
