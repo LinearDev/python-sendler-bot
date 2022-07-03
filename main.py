@@ -1,4 +1,4 @@
-#import logging
+import logging
 
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, executor, types
@@ -8,11 +8,12 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
+logging.basicConfig(level=logging.INFO)
+
 from db import Database
 
-#logging.basicConfig(level=logging.INFO)
-
-bot = Bot(token="5529982744:AAF5FUgJE05d9DN6CdtvZPRpV5yPD4wAM-U")
+#5529982744:AAF5FUgJE05d9DN6CdtvZPRpV5yPD4wAM-U 5196084873:AAFC9TjmqO-dr5mVLTFoun6h5do9W-amPss
+bot = Bot(token="5196084873:AAFC9TjmqO-dr5mVLTFoun6h5do9W-amPss")
 storage=MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 db = Database('database.db')
@@ -28,6 +29,7 @@ inline_kb = InlineKeyboardMarkup(row_width=1)
 inline_hello_btn = InlineKeyboardButton(text='ССЫЛКА', url="https://t.me/+T91wk9C0v_A3OTIy")
 inline_kb.add(inline_hello_btn)
 
+#send a start message
 @dp.message_handler(commands=['start'])
 async def start(message: types.Message):
     if message.chat.type == "private":
@@ -63,7 +65,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     await state.finish()
     await bot.send_message(message.from_user.id, 'Заполнение формы остановлено')
 
-#reply for message photo
+#reply for message text
 @dp.message_handler(state=Form.text)
 async def message_text(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
@@ -72,13 +74,13 @@ async def message_text(message: types.Message, state: FSMContext):
     await Form.next()
     await bot.send_message(message.from_user.id, 'Будет ли кнопка-ссылка? (yes, no)')
 
-#reply for message textds
+#reply for message question for message button
 @dp.message_handler(state=Form.but_state)
 async def message_state(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['but_state'] = message.text
 
-        if message.text == "yes":
+        if message.text == 'yes':
             await Form.next()
             await bot.send_message(message.from_user.id, 'Текст кнопки')
         else:
@@ -87,7 +89,7 @@ async def message_state(message: types.Message, state: FSMContext):
                 try:
                     if int(row[1]) != 1:
                         db.set_active(row[0], 1)
-                    await bot.send_message(row[0], data['text'])
+                    await bot.send_message(row[0], data['text'], parse_mode='Markdown')
                 except:
                     db.set_active(row[0], 0)
             await bot.send_message(message.from_user.id, 'Send Success!')
@@ -100,7 +102,7 @@ async def btn_text(message: types.Message, state: FSMContext):
         data['but_text'] = message.text
     
     await Form.next()
-    await bot.send_message(message.from_user.id, 'Ввкдите ссылку для кнопки')
+    await bot.send_message(message.from_user.id, 'Введите ссылку для кнопки')
 
 #add link for button
 @dp.message_handler(state=Form.but_link)
@@ -115,14 +117,15 @@ async def btn_link(message: types.Message, state: FSMContext):
         users = db.get_users()
         for row in users:
             try:
-                await bot.send_message(row[0], data['text'], reply_markup=spamm_link)
                 if int(row[1]) != 1:
                     db.set_active(row[0], 1)
+                await bot.send_message(row[0], data['text'], reply_markup=spamm_link, parse_mode='Markdown')
             except:
                 db.set_active(row[0], 0)
         await bot.send_message(message.from_user.id, 'Send Success!')
         await state.finish()
 
+#command for adding admins
 @dp.message_handler(commands=['add_admin'])
 async def add_admin(message: types.Message):
     if db.get_admins(message.from_user.id):
@@ -130,6 +133,13 @@ async def add_admin(message: types.Message):
         await bot.send_message(message.from_user.id, "Admin by ID: "+message.text[11:]+" add to database")
     else:
         pass
+
+#get users
+@dp.message_handler(commands=['users'])
+async def get_count(message: types.Message):
+    if db.get_admins(message.from_user.id):
+        user_count = str(db.get_user_count()).replace("(", '').replace(")", '').replace("[", '').replace("]", '').replace(",", '')
+        await bot.send_message(message.from_user.id, "Users in bot: "+user_count)
     
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates = True)
