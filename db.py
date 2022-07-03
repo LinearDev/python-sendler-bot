@@ -1,5 +1,6 @@
 import sqlite3
 
+#database class
 class Database:
     def __init__(self, db_file):
         self.connetion = sqlite3.connect(db_file)
@@ -22,6 +23,14 @@ class Database:
         with self.connetion:
             return self.cursor.execute("SELECT `user_id`, `active` FROM `users`").fetchall()
     
+    def get_user_count(self):
+        with self.connetion:
+            return self.cursor.execute("SELECT COUNT(*) FROM `users`").fetchmany(1)
+    
+    def get__active_user_count(self):
+        with self.connetion:
+            return self.cursor.execute("SELECT COUNT(*) FROM `users` WHERE `active` = ?", (1,)).fetchmany(1)
+
     def get_admins(self, admin_id):
         with self.connetion:
             result = self.cursor.execute("SELECT * FROM `admins` WHERE `admin_id` = ?", (admin_id,)).fetchmany(1)
