@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 from db import Database
 
 #5529982744:AAF5FUgJE05d9DN6CdtvZPRpV5yPD4wAM-U 5196084873:AAFC9TjmqO-dr5mVLTFoun6h5do9W-amPss
-bot = Bot(token="5196084873:AAFC9TjmqO-dr5mVLTFoun6h5do9W-amPss")
+bot = Bot(token="5529982744:AAF5FUgJE05d9DN6CdtvZPRpV5yPD4wAM-U")
 storage=MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 db = Database('database.db')
@@ -141,6 +141,7 @@ async def get_count(message: types.Message):
         user_count = str(db.get_user_count()).replace("(", '').replace(")", '').replace("[", '').replace("]", '').replace(",", '')
         active_users = str(db.get_user_count()).replace("(", '').replace(")", '').replace("[", '').replace("]", '').replace(",", '')
         await bot.send_message(message.from_user.id, "Users in bot: "+user_count+"\nActive users: "+active_users)
-    
+
+#main entry point
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates = True)
