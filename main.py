@@ -35,7 +35,7 @@ async def start(message: types.Message):
     if message.chat.type == "private":
         if not db.user_exists(message.from_user.id):
             db.add_user(message.from_user.id)
-        await bot.send_photo(message.from_user.id, photo=open('hello_img.jpg', 'rb'))
+        await bot.send_photo(message.from_user.id, photo=open('img_two.jpg', 'rb'))
         
         await bot.send_message(
             message.from_user.id,
