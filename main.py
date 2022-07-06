@@ -1,5 +1,3 @@
-#import logging
-
 import aiogram.utils.markdown as md
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
@@ -10,9 +8,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
 from db import Database
 
-#logging.basicConfig(level=logging.INFO)
-
-bot = Bot(token="5529982744:AAF5FUgJE05d9DN6CdtvZPRpV5yPD4wAM-U")
+bot = Bot(token="5196084873:AAFC9TjmqO-dr5mVLTFoun6h5do9W-amPss")
 storage=MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 db = Database('database.db')
@@ -33,7 +29,7 @@ async def start(message: types.Message):
     if message.chat.type == "private":
         if not db.user_exists(message.from_user.id):
             db.add_user(message.from_user.id)
-        await bot.send_photo(message.from_user.id, photo=open('hello_img.jpg', 'rb'))
+        await bot.send_photo(message.from_user.id, photo=open('img_two.jpg', 'rb'))
         
         await bot.send_message(
             message.from_user.id,
@@ -87,7 +83,7 @@ async def message_state(message: types.Message, state: FSMContext):
                 try:
                     if int(row[1]) != 1:
                         db.set_active(row[0], 1)
-                    await bot.send_message(row[0], data['text'])
+                    await bot.send_message(row[0], data['text'], parse_mode='Markdown')
                 except:
                     db.set_active(row[0], 0)
             await bot.send_message(message.from_user.id, 'Send Success!')
@@ -100,7 +96,7 @@ async def btn_text(message: types.Message, state: FSMContext):
         data['but_text'] = message.text
     
     await Form.next()
-    await bot.send_message(message.from_user.id, 'Ввкдите ссылку для кнопки')
+    await bot.send_message(message.from_user.id, 'Введите ссылку для кнопки')
 
 #add link for button
 @dp.message_handler(state=Form.but_link)
