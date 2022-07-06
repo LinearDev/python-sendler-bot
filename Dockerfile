@@ -1,10 +1,10 @@
-FROM ubuntu:latest
+FROM python:3
 
-RUN apt update
-RUN apt install python3 -y
-RUN apt update -y
-RUN apt install python3-pip -y
+ADD . /sendler
+
 RUN pip install aiogram
 RUN pip install db-sqlite3
+
+WORKDIR /sendler
 
 CMD [ "python3", "./main.py" ]
